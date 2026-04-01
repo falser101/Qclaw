@@ -192,21 +192,7 @@ export async function recordBaselineBackupDeletionBypass(params: {
 async function copyIntoBackup(candidate: OpenClawInstallCandidate, backupDir: string): Promise<void> {
   const copiedStateRoot = path.join(backupDir, 'openclaw-home')
   if (await pathExists(candidate.stateRoot)) {
-    // 排除 .asar 文件、node_modules 和其他不需要备份的目录
-    await cp(candidate.stateRoot, copiedStateRoot, {
-      recursive: true,
-      force: true,
-      filter: (src) => {
-        const basename = path.basename(src)
-        // 排除 .asar 文件（Electron 归档格式，无法正常复制）
-        if (basename.endsWith('.asar')) return false
-        // 排除 node_modules（体积大且可能包含 .asar 文件）
-        if (basename === 'node_modules') return false
-        // 排除其他 Electron 备份目录
-        if (basename.includes('electron-backup') || basename.includes('electron-dist')) return false
-        return true
-      },
-    })
+    await cp(candidate.stateRoot, copiedStateRoot, { recursive: true, force: true })
     return
   }
 
